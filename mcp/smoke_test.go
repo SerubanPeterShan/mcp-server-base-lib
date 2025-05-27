@@ -33,7 +33,7 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 		case <-tick:
 			resp, err = http.Get("http://localhost:8083/health")
 			if err == nil && resp.StatusCode == http.StatusOK {
-				break
+				break waitLoop
 			}
 		}
 	}
