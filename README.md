@@ -121,7 +121,7 @@ This project uses automated security scanning:
 
 ## Versioning
 
-This project follows [Semantic Versioning](https://semver.org/). For the versions available, see the [tags on this repository](https://github.com/serubanpetershan/mcp-server/tags).
+This project follows [Semantic Versioning](https://semver.org/). For the versions available, see the [tags on this repository](https://github.com/serubanpetershan/mcp-server-base-library/tags).
 
 To create a new release:
 1. Update the VERSION file
