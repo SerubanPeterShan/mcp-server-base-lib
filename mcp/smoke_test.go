@@ -92,8 +92,11 @@ func TestSmokeServerStartup(t *testing.T) {
 	for _, tc := range testCases {
 		t.Run(tc.name, func(t *testing.T) {
 			server := NewServer(tc.config)
-			err := server.Start(tc.port)
-			require.NoError(t, err)
+			go func() {
+				err := server.Start(tc.port)
+				require.NoError(t, err)
+			}()
+			time.Sleep(100 * time.Millisecond) // Allow server to initialize
 
 			// Verify server is running
 			resp, err := http.Get("http://localhost:" + tc.port + "/health")
