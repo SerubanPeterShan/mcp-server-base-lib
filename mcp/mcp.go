@@ -1,9 +1,11 @@
 package mcp
 
 import (
+	"context"
 	"encoding/json"
 	"net/http"
 	"sync"
+	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -190,4 +192,12 @@ func (s *Server) Stop() error {
 		return s.server.Shutdown(ctx)
 	}
 	return nil
+}
+
+// GetPort returns the port the server is running on
+func (s *Server) GetPort() string {
+	if s.server != nil {
+		return s.server.Addr[1:] // Remove the leading ":"
+	}
+	return ""
 }
