@@ -2,17 +2,13 @@ package mcp
 
 import (
 	"encoding/json"
-	"net/http"
 	"testing"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
-
-const serverTimeoutMsg = "Server did not become ready in time"
 
 func TestSmokeBasicFunctionality(t *testing.T) {
 	// Basic smoke test to verify core functionality
@@ -24,25 +20,7 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 		err := server.Start("8083")
 		require.NoError(t, err)
 	}()
-	// Wait for server to be ready
-	timeout := time.After(5 * time.Second)
-	ticker := time.NewTicker(100 * time.Millisecond)
-	var resp *http.Response
-	var err error
-waitLoop:
-	for {
-		select {
-		case <-timeout:
-			t.Fatalf(serverTimeoutMsg)
-		case <-ticker.C:
-			resp, err = http.Get("http://localhost:8083/health")
-			if err == nil && resp.StatusCode == http.StatusOK {
-				break waitLoop
-			}
-		}
-	}
-	require.NoError(t, err)
-	assert.Equal(t, http.StatusOK, resp.StatusCode)
+	waitForServerReady("8083", t)
 
 	// Test WebSocket connection
 	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8083/ws", nil)
@@ -100,25 +78,7 @@ func TestSmokeServerStartup(t *testing.T) {
 				err := server.Start(tc.port)
 				require.NoError(t, err)
 			}()
-			// Wait for server to be ready
-			timeout := time.After(5 * time.Second)
-			tick := time.Tick(100 * time.Millisecond)
-			var resp *http.Response
-			var err error
-		waitLoop:
-			for {
-				select {
-				case <-timeout:
-					t.Fatalf(serverTimeoutMsg)
-				case <-tick:
-					resp, err = http.Get("http://localhost:" + tc.port + "/health")
-					if err == nil && resp.StatusCode == http.StatusOK {
-						break waitLoop
-					}
-				}
-			}
-			require.NoError(t, err)
-			assert.Equal(t, http.StatusOK, resp.StatusCode)
+			waitForServerReady(tc.port, t)
 		})
 	}
 }
@@ -135,24 +95,7 @@ func TestSmokeMessageHandling(t *testing.T) {
 	})
 
 	go server.Start("8086")
-	// Wait for server to be ready
-	timeout := time.After(5 * time.Second)
-	tick := time.Tick(100 * time.Millisecond)
-	var resp *http.Response
-	var err error
-waitLoop:
-	for {
-		select {
-		case <-timeout:
-			t.Fatalf(serverTimeoutMsg)
-		case <-tick:
-			resp, err = http.Get("http://localhost:8086/health")
-			if err == nil && resp.StatusCode == http.StatusOK {
-				break waitLoop
-			}
-		}
-	}
-	require.NoError(t, err)
+	waitForServerReady("8086", t)
 
 	// Connect client
 	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8086/ws", nil)

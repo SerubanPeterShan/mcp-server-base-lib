@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"errors"
 	"testing"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -16,7 +15,7 @@ func TestRegressionReconnection(t *testing.T) {
 	// Test client reconnection behavior
 	server := NewServer(&Config{Logger: logrus.New()})
 	go server.Start("8087")
-	time.Sleep(100 * time.Millisecond)
+	waitForServerReady("8087", t)
 
 	// First connection
 	conn1, _, err := websocket.DefaultDialer.Dial("ws://localhost:8087/ws", nil)
@@ -37,7 +36,7 @@ func TestRegressionMessageOrder(t *testing.T) {
 	// Test message ordering and delivery
 	server := NewServer(&Config{Logger: logrus.New()})
 	go server.Start("8088")
-	time.Sleep(100 * time.Millisecond)
+	waitForServerReady("8088", t)
 
 	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8088/ws", nil)
 	require.NoError(t, err)
@@ -76,7 +75,7 @@ func TestRegressionErrorHandling(t *testing.T) {
 		},
 	})
 	go server.Start("8089")
-	time.Sleep(100 * time.Millisecond)
+	waitForServerReady("8089", t)
 
 	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8089/ws", nil)
 	require.NoError(t, err)
@@ -99,7 +98,7 @@ func TestRegressionConcurrentConnections(t *testing.T) {
 	// Test handling of many concurrent connections
 	server := NewServer(&Config{Logger: logrus.New()})
 	go server.Start("8090")
-	time.Sleep(100 * time.Millisecond)
+	waitForServerReady("8090", t)
 
 	// Create many connections
 	connections := make([]*websocket.Conn, 50)
