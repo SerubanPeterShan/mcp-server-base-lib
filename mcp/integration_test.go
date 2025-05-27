@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"strconv"
 	"testing"
-	"time"
 
 	"github.com/gorilla/websocket"
 	"github.com/sirupsen/logrus"
@@ -34,9 +33,6 @@ func TestIntegrationMultipleClients(t *testing.T) {
 		err := server.Start("8080")
 		require.NoError(t, err)
 	}()
-
-	// Wait for server to start
-	time.Sleep(100 * time.Millisecond)
 
 	// Connect multiple clients
 	clients := make([]*websocket.Conn, 3)
@@ -72,7 +68,6 @@ func TestIntegrationConcurrentOperations(t *testing.T) {
 
 	server := NewServer(&Config{Logger: logrus.New()})
 	go server.Start("8081")
-	time.Sleep(100 * time.Millisecond)
 
 	// Create multiple clients
 	clients := make([]*websocket.Conn, 5)
@@ -109,7 +104,6 @@ func TestIntegrationServerShutdown(t *testing.T) {
 
 	server := NewServer(&Config{Logger: logrus.New()})
 	go server.Start("8082")
-	time.Sleep(100 * time.Millisecond)
 
 	// Connect a client
 	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8082/ws", nil)

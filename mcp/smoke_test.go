@@ -25,14 +25,13 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 	// Wait for server to be ready
 	timeout := time.After(5 * time.Second)
 	ticker := time.NewTicker(100 * time.Millisecond)
-	defer ticker.Stop()
 	var resp *http.Response
 	var err error
 waitLoop:
 	for {
 		select {
 		case <-timeout:
-			t.Fatalf("Server did not become ready in time")
+			t.Fatalf(serverTimeoutMsg)
 		case <-ticker.C:
 			resp, err = http.Get("http://localhost:8083/health")
 			if err == nil && resp.StatusCode == http.StatusOK {
@@ -108,7 +107,7 @@ func TestSmokeServerStartup(t *testing.T) {
 			for {
 				select {
 				case <-timeout:
-					t.Fatalf("Server did not become ready in time")
+					t.Fatalf(serverTimeoutMsg)
 				case <-tick:
 					resp, err = http.Get("http://localhost:" + tc.port + "/health")
 					if err == nil && resp.StatusCode == http.StatusOK {
@@ -143,7 +142,7 @@ waitLoop:
 	for {
 		select {
 		case <-timeout:
-			t.Fatalf("Server did not become ready in time")
+			t.Fatalf(serverTimeoutMsg)
 		case <-tick:
 			resp, err = http.Get("http://localhost:8086/health")
 			if err == nil && resp.StatusCode == http.StatusOK {
