@@ -179,3 +179,22 @@ func (s *Server) handleHealthCheck(w http.ResponseWriter, r *http.Request) {
 		"status": "healthy",
 	})
 }
+
+// Shutdown gracefully shuts down the server
+func (s *Server) Shutdown() error {
+	s.mutex.Lock()
+	defer s.mutex.Unlock()
+
+	// Close all client connections
+	for client := range s.clients {
+		client.Close()
+		delete(s.clients, client)
+	}
+
+	// Close channels
+	close(s.broadcast)
+	close(s.register)
+	close(s.unregister)
+
+	return nil
+}

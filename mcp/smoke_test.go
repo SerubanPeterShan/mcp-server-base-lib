@@ -15,7 +15,7 @@ import (
 func TestSmokeBasicFunctionality(t *testing.T) {
 	// Basic smoke test to verify core functionality
 	server := NewServer(&Config{Logger: logrus.New()})
-	defer server.Stop()
+	defer server.Shutdown()
 
 	// Start server
 	go func() {
@@ -25,6 +25,7 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 	// Wait for server to be ready
 	timeout := time.After(5 * time.Second)
 	ticker := time.NewTicker(100 * time.Millisecond)
+	defer ticker.Stop()
 	var resp *http.Response
 	var err error
 waitLoop:
