@@ -35,7 +35,7 @@ By participating in this project, you agree to maintain a respectful and inclusi
 
 ## Development Setup
 
-1. Install Go 1.21 or later
+1. Install Go 1.23 or later
 2. Fork and clone the repository
 3. Install dependencies:
    ```bash
