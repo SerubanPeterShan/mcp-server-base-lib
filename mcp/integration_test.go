@@ -11,10 +11,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const skipIntegrationTestMsg = "Skipping integration test in short mode"
+
 func TestIntegrationMultipleClients(t *testing.T) {
 	// Skip in short mode
 	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
+		t.Skip(skipIntegrationTestMsg)
 	}
 
 	server := NewServer(&Config{
@@ -64,7 +66,7 @@ func TestIntegrationMultipleClients(t *testing.T) {
 
 func TestIntegrationConcurrentOperations(t *testing.T) {
 	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
+		t.Skip(skipIntegrationTestMsg)
 	}
 
 	server := NewServer(&Config{Logger: logrus.New()})
@@ -101,7 +103,7 @@ func TestIntegrationConcurrentOperations(t *testing.T) {
 
 func TestIntegrationServerShutdown(t *testing.T) {
 	if testing.Short() {
-		t.Skip("Skipping integration test in short mode")
+		t.Skip(skipIntegrationTestMsg)
 	}
 
 	server := NewServer(&Config{Logger: logrus.New()})
