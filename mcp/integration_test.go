@@ -121,7 +121,7 @@ func TestIntegrationServerShutdown(t *testing.T) {
 	assert.Len(t, clients, 1)
 
 	// Properly shut down the server
-	err = server.Shutdown()
+	err = server.Stop()
 	require.NoError(t, err)
 
 	// Verify client is disconnected
