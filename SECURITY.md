@@ -52,7 +52,7 @@ Security updates will be released as patch versions (e.g., 1.0.1, 1.0.2) and wil
 
 For security-related questions or concerns, please contact:
 - Email: security@serubanpetershan.com
-- PGP Key: [Your PGP Key if available]
+- PGP Key: [No PGP key is currently available]
 
 ## Responsible Disclosure
 
