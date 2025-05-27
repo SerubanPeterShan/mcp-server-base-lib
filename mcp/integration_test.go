@@ -88,7 +88,7 @@ func TestIntegrationConcurrentOperations(t *testing.T) {
 		go func(index int) {
 			msg := Message{
 				Type:    "test",
-				Payload: json.RawMessage(`{"index": ` + string(rune(index)) + `}`),
+				Payload: json.RawMessage(`{"index": ` + strconv.Itoa(index) + `}`),
 			}
 			server.Broadcast(msg)
 			done <- true
