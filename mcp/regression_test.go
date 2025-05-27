@@ -70,7 +70,7 @@ func TestRegressionErrorHandling(t *testing.T) {
 		Logger: logrus.New(),
 		Handlers: map[string]MessageHandler{
 			"error": func(s *Server, conn *websocket.Conn, msg Message) error {
-				return assert.AnError
+				return errors.New("simulated error for testing purposes")
 			},
 		},
 	})
