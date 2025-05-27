@@ -15,7 +15,7 @@ A Go library for implementing Machine Control Protocol (MCP) servers. This is a 
 ## Installation
 
 ```bash
-go get github.com/serubanpetershan/mcp-server
+go get github.com/serubanpetershan/mcp-server-base-library
 ```
 
 ## Usage
@@ -110,6 +110,29 @@ See the `examples` directory for complete examples of how to use this library in
 3. Commit your changes
 4. Push to the branch
 5. Create a new Pull Request
+
+## Security
+
+This project uses automated security scanning:
+- SonarQube for code quality and security analysis
+- Snyk for dependency vulnerability scanning
+- Weekly automated security scans
+- All pull requests are automatically scanned
+
+## Versioning
+
+This project follows [Semantic Versioning](https://semver.org/). For the versions available, see the [tags on this repository](https://github.com/serubanpetershan/mcp-server/tags).
+
+To create a new release:
+1. Update the VERSION file
+2. Create a new tag: `git tag -a v1.0.0 -m "Release v1.0.0"`
+3. Push the tag: `git push origin v1.0.0`
+
+The release workflow will automatically:
+- Run tests
+- Build the project
+- Create a GitHub release
+- Generate a changelog
 
 ## License
 
