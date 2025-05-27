@@ -4,9 +4,9 @@ import (
 	"log"
 	"os"
 
-	"github.com/serubanpetershan/mcp-server/mcp"
+	"github.com/gorilla/websocket"
+	"github.com/serubanpetershan/mcp-server-base-library/mcp"
 	"github.com/sirupsen/logrus"
-	"golang.org/x/net/websocket"
 )
 
 func main() {

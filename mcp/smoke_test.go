@@ -1,0 +1,127 @@
+package mcp
+
+import (
+	"encoding/json"
+	"net/http"
+	"testing"
+	"time"
+
+	"github.com/gorilla/websocket"
+	"github.com/sirupsen/logrus"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
+)
+
+func TestSmoke_BasicFunctionality(t *testing.T) {
+	// Basic smoke test to verify core functionality
+	server := NewServer(&Config{Logger: logrus.New()})
+
+	// Start server
+	go func() {
+		err := server.Start("8083")
+		require.NoError(t, err)
+	}()
+	time.Sleep(100 * time.Millisecond)
+
+	// Test health check
+	resp, err := http.Get("http://localhost:8083/health")
+	require.NoError(t, err)
+	assert.Equal(t, http.StatusOK, resp.StatusCode)
+
+	// Test WebSocket connection
+	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8083/ws", nil)
+	require.NoError(t, err)
+	defer conn.Close()
+
+	// Test message sending
+	msg := Message{
+		Type:    "test",
+		Payload: json.RawMessage(`{"data": "smoke test"}`),
+	}
+	err = server.Send(conn, msg)
+	require.NoError(t, err)
+
+	// Verify message received
+	var receivedMsg Message
+	err = conn.ReadJSON(&receivedMsg)
+	require.NoError(t, err)
+	assert.Equal(t, msg.Type, receivedMsg.Type)
+	assert.Equal(t, msg.Payload, receivedMsg.Payload)
+}
+
+func TestSmoke_ServerStartup(t *testing.T) {
+	// Test server startup with different configurations
+	testCases := []struct {
+		name   string
+		config *Config
+		port   string
+	}{
+		{
+			name: "Default Config",
+			config: &Config{
+				Logger: logrus.New(),
+			},
+			port: "8084",
+		},
+		{
+			name: "With Handlers",
+			config: &Config{
+				Logger: logrus.New(),
+				Handlers: map[string]MessageHandler{
+					"echo": func(s *Server, conn *websocket.Conn, msg Message) error {
+						return s.Send(conn, msg)
+					},
+				},
+			},
+			port: "8085",
+		},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			server := NewServer(tc.config)
+			err := server.Start(tc.port)
+			require.NoError(t, err)
+
+			// Verify server is running
+			resp, err := http.Get("http://localhost:" + tc.port + "/health")
+			require.NoError(t, err)
+			assert.Equal(t, http.StatusOK, resp.StatusCode)
+		})
+	}
+}
+
+func TestSmoke_MessageHandling(t *testing.T) {
+	// Test basic message handling functionality
+	server := NewServer(&Config{
+		Logger: logrus.New(),
+		Handlers: map[string]MessageHandler{
+			"echo": func(s *Server, conn *websocket.Conn, msg Message) error {
+				return s.Send(conn, msg)
+			},
+		},
+	})
+
+	go server.Start("8086")
+	time.Sleep(100 * time.Millisecond)
+
+	// Connect client
+	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8086/ws", nil)
+	require.NoError(t, err)
+	defer conn.Close()
+
+	// Send message
+	msg := Message{
+		Type:    "echo",
+		Payload: json.RawMessage(`{"data": "echo test"}`),
+	}
+	err = conn.WriteJSON(msg)
+	require.NoError(t, err)
+
+	// Verify echo response
+	var response Message
+	err = conn.ReadJSON(&response)
+	require.NoError(t, err)
+	assert.Equal(t, msg.Type, response.Type)
+	assert.Equal(t, msg.Payload, response.Payload)
+}
