@@ -9,13 +9,11 @@ on:
     - cron: '0 0 * * 0'  # Run weekly on Sunday
 
 jobs:
-  security-scan:
+  snyk-scan:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
-        with:
-          fetch-depth: 0
-
+      
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
@@ -28,10 +26,34 @@ jobs:
         with:
           args: --severity-threshold=high
 
+  sonarqube-scan:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: '1.23.0'
+
+      - name: Run tests with coverage
+        run: |
+          go test -v -coverprofile=coverage.out ./...
+          go tool cover -func=coverage.out
+
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
         env:
           SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
+        with:
+          args: >
+            -Dsonar.go.coverage.reportPaths=coverage.out
+            -Dsonar.sources=.
+            -Dsonar.tests=.
+            -Dsonar.test.inclusions=**/*_test.go
+            -Dsonar.exclusions=**/vendor/**,**/testdata/**
 
       - name: Run Go tests with coverage
         run: |
