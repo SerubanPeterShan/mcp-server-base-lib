@@ -88,7 +88,7 @@ func TestIntegrationConcurrentOperations(t *testing.T) {
 		go func(index int) {
 			msg := Message{
 				Type:    "test",
-				Payload: json.RawMessage(`{"index": ` + string(rune(index)) + `}`),
+				Payload: json.RawMessage(`{"index": ` + strconv.Itoa(index) + `}`),
 			}
 			server.Broadcast(msg)
 			done <- true
@@ -119,10 +119,9 @@ func TestIntegrationServerShutdown(t *testing.T) {
 	clients := server.GetClients()
 	assert.Len(t, clients, 1)
 
-	// Simulate server shutdown
-	// Note: In a real implementation, you would need to add a shutdown method
-	// This is just a simulation
-	time.Sleep(100 * time.Millisecond)
+	// Properly shut down the server
+	err = server.Shutdown()
+	require.NoError(t, err)
 
 	// Verify client is disconnected
 	clients = server.GetClients()
