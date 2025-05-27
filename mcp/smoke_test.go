@@ -24,7 +24,8 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 	}()
 	// Wait for server to be ready
 	timeout := time.After(5 * time.Second)
-	tick := time.Tick(100 * time.Millisecond)
+	ticker := time.NewTicker(100 * time.Millisecond)
+	defer ticker.Stop()
 	var resp *http.Response
 	var err error
 waitLoop:
