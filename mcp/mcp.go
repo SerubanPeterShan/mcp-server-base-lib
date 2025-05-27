@@ -24,6 +24,7 @@ type Server struct {
 	mutex      sync.Mutex
 	logger     *logrus.Logger
 	handlers   map[string]MessageHandler
+	server     *http.Server
 }
 
 // MessageHandler is a function type for handling messages
@@ -92,7 +93,8 @@ func (s *Server) Start(port string) error {
 
 	// Start HTTP server
 	s.logger.Infof("Starting MCP server on port %s", port)
-	return http.ListenAndServe(":"+port, nil)
+	s.server = &http.Server{Addr: ":" + port}
+	return s.server.ListenAndServe()
 }
 
 // handleWebSocketConnection handles new WebSocket connections
