@@ -26,6 +26,7 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 	tick := time.Tick(100 * time.Millisecond)
 	var resp *http.Response
 	var err error
+waitLoop:
 	for {
 		select {
 		case <-timeout:
