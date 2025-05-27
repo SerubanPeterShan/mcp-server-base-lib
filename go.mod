@@ -1,4 +1,4 @@
-module github.com/serubanpetershan/mcp-server
+module github.com/serubanpetershan/mcp-server-base-library
 
 go 1.21
 
