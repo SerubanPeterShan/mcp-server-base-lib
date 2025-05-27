@@ -12,7 +12,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestSmoke_BasicFunctionality(t *testing.T) {
+func TestSmokeBasicFunctionality(t *testing.T) {
 	// Basic smoke test to verify core functionality
 	server := NewServer(&Config{Logger: logrus.New()})
 
@@ -49,7 +49,7 @@ func TestSmoke_BasicFunctionality(t *testing.T) {
 	assert.Equal(t, msg.Payload, receivedMsg.Payload)
 }
 
-func TestSmoke_ServerStartup(t *testing.T) {
+func TestSmokeServerStartup(t *testing.T) {
 	// Test server startup with different configurations
 	testCases := []struct {
 		name   string
@@ -91,7 +91,7 @@ func TestSmoke_ServerStartup(t *testing.T) {
 	}
 }
 
-func TestSmoke_MessageHandling(t *testing.T) {
+func TestSmokeMessageHandling(t *testing.T) {
 	// Test basic message handling functionality
 	server := NewServer(&Config{
 		Logger: logrus.New(),

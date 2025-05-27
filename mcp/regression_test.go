@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestRegression_Reconnection(t *testing.T) {
+func TestRegressionReconnection(t *testing.T) {
 	// Test client reconnection behavior
 	server := NewServer(&Config{Logger: logrus.New()})
 	go server.Start("8087")
@@ -32,7 +32,7 @@ func TestRegression_Reconnection(t *testing.T) {
 	assert.Len(t, clients, 1)
 }
 
-func TestRegression_MessageOrder(t *testing.T) {
+func TestRegressionMessageOrder(t *testing.T) {
 	// Test message ordering and delivery
 	server := NewServer(&Config{Logger: logrus.New()})
 	go server.Start("8088")
@@ -64,7 +64,7 @@ func TestRegression_MessageOrder(t *testing.T) {
 	}
 }
 
-func TestRegression_ErrorHandling(t *testing.T) {
+func TestRegressionErrorHandling(t *testing.T) {
 	// Test error handling scenarios
 	server := NewServer(&Config{
 		Logger: logrus.New(),
@@ -94,7 +94,7 @@ func TestRegression_ErrorHandling(t *testing.T) {
 	require.NoError(t, err)
 }
 
-func TestRegression_ConcurrentConnections(t *testing.T) {
+func TestRegressionConcurrentConnections(t *testing.T) {
 	// Test handling of many concurrent connections
 	server := NewServer(&Config{Logger: logrus.New()})
 	go server.Start("8090")

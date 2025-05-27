@@ -11,7 +11,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestIntegration_MultipleClients(t *testing.T) {
+func TestIntegrationMultipleClients(t *testing.T) {
 	// Skip in short mode
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
@@ -62,7 +62,7 @@ func TestIntegration_MultipleClients(t *testing.T) {
 	}
 }
 
-func TestIntegration_ConcurrentOperations(t *testing.T) {
+func TestIntegrationConcurrentOperations(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
@@ -99,7 +99,7 @@ func TestIntegration_ConcurrentOperations(t *testing.T) {
 	}
 }
 
-func TestIntegration_ServerShutdown(t *testing.T) {
+func TestIntegrationServerShutdown(t *testing.T) {
 	if testing.Short() {
 		t.Skip("Skipping integration test in short mode")
 	}
