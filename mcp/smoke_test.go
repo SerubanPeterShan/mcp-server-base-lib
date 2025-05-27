@@ -12,9 +12,12 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
+const serverTimeoutMsg = "Server did not become ready in time"
+
 func TestSmokeBasicFunctionality(t *testing.T) {
 	// Basic smoke test to verify core functionality
 	server := NewServer(&Config{Logger: logrus.New()})
+	defer server.Stop()
 
 	// Start server
 	go func() {
@@ -30,7 +33,7 @@ waitLoop:
 	for {
 		select {
 		case <-timeout:
-			t.Fatalf("Server did not become ready in time")
+			t.Fatalf(serverTimeoutMsg)
 		case <-ticker.C:
 			resp, err = http.Get("http://localhost:8083/health")
 			if err == nil && resp.StatusCode == http.StatusOK {
@@ -97,10 +100,23 @@ func TestSmokeServerStartup(t *testing.T) {
 				err := server.Start(tc.port)
 				require.NoError(t, err)
 			}()
-			time.Sleep(100 * time.Millisecond) // Allow server to initialize
-
-			// Verify server is running
-			resp, err := http.Get("http://localhost:" + tc.port + "/health")
+			// Wait for server to be ready
+			timeout := time.After(5 * time.Second)
+			tick := time.Tick(100 * time.Millisecond)
+			var resp *http.Response
+			var err error
+		waitLoop:
+			for {
+				select {
+				case <-timeout:
+					t.Fatalf(serverTimeoutMsg)
+				case <-tick:
+					resp, err = http.Get("http://localhost:" + tc.port + "/health")
+					if err == nil && resp.StatusCode == http.StatusOK {
+						break waitLoop
+					}
+				}
+			}
 			require.NoError(t, err)
 			assert.Equal(t, http.StatusOK, resp.StatusCode)
 		})
@@ -119,7 +135,24 @@ func TestSmokeMessageHandling(t *testing.T) {
 	})
 
 	go server.Start("8086")
-	time.Sleep(100 * time.Millisecond)
+	// Wait for server to be ready
+	timeout := time.After(5 * time.Second)
+	tick := time.Tick(100 * time.Millisecond)
+	var resp *http.Response
+	var err error
+waitLoop:
+	for {
+		select {
+		case <-timeout:
+			t.Fatalf(serverTimeoutMsg)
+		case <-tick:
+			resp, err = http.Get("http://localhost:8086/health")
+			if err == nil && resp.StatusCode == http.StatusOK {
+				break waitLoop
+			}
+		}
+	}
+	require.NoError(t, err)
 
 	// Connect client
 	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8086/ws", nil)
