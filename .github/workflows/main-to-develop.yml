@@ -1,0 +1,50 @@
+name: Sync Main to Develop
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  sync-pr:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure Git
+        run: |
+          git config --global user.name 'GitHub Actions'
+          git config --global user.email 'github-actions@github.com'
+
+      - name: Create sync branch
+        run: |
+          BRANCH_NAME="sync/main-to-develop-$(date +%Y%m%d-%H%M%S)"
+          git checkout -b $BRANCH_NAME
+          git checkout develop
+          git merge main --no-commit
+          git checkout $BRANCH_NAME
+          git add .
+          git commit -m "chore: sync main to develop" || true
+          git push origin $BRANCH_NAME
+          echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
+
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v5
+        with:
+          token: ${{ secrets.GITHUB_TOKEN }}
+          base: develop
+          branch: ${{ env.BRANCH_NAME }}
+          title: 'chore: sync main to develop'
+          body: |
+            This PR was automatically created to sync changes from main to develop.
+            
+            Please resolve any conflicts and merge this PR to keep develop in sync with main.
+            
+            Changes in this PR:
+            ${{ github.event.head_commit.message }}
+          labels: |
+            sync
+            needs-review 
