@@ -15,6 +15,7 @@ import (
 func TestSmokeBasicFunctionality(t *testing.T) {
 	// Basic smoke test to verify core functionality
 	server := NewServer(&Config{Logger: logrus.New()})
+	defer server.Stop()
 
 	// Start server
 	go func() {
