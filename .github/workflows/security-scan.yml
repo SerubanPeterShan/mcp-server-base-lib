@@ -55,10 +55,6 @@ jobs:
             -Dsonar.test.inclusions=**/*_test.go
             -Dsonar.exclusions=**/vendor/**,**/testdata/**
 
-      - name: Run Go tests with coverage
-        run: |
-          go test -v -coverprofile=coverage.out -json ./... > test-report.json
-
       - name: Upload coverage to SonarQube
         uses: codecov/codecov-action@v3
         with:
