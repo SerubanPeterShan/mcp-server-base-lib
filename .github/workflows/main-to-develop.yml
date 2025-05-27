@@ -1,4 +1,4 @@
-name: Sync Main to Develop
+name: Sync Master to Develop
 
 on:
   push:
@@ -21,13 +21,13 @@ jobs:
 
       - name: Create sync branch
         run: |
-          BRANCH_NAME="sync/main-to-develop-$(date +%Y%m%d-%H%M%S)"
+          BRANCH_NAME="sync/master-to-develop-$(date +%Y%m%d-%H%M%S)"
           git checkout -b $BRANCH_NAME
           git checkout develop
-          git merge main --no-commit
+          git merge master --no-commit
           git checkout $BRANCH_NAME
           git add .
-          git commit -m "chore: sync main to develop" || true
+          git commit -m "chore: sync master to develop" || true
           git push origin $BRANCH_NAME
           echo "BRANCH_NAME=$BRANCH_NAME" >> $GITHUB_ENV
 
@@ -37,11 +37,11 @@ jobs:
           token: ${{ secrets.GITHUB_TOKEN }}
           base: develop
           branch: ${{ env.BRANCH_NAME }}
-          title: 'chore: sync main to develop'
+          title: 'chore: sync master to develop'
           body: |
-            This PR was automatically created to sync changes from main to develop.
+            This PR was automatically created to sync changes from master to develop.
             
-            Please resolve any conflicts and merge this PR to keep develop in sync with main.
+            Please resolve any conflicts and merge this PR to keep develop in sync with master.
             
             Changes in this PR:
             ${{ github.event.head_commit.message }}
