@@ -19,7 +19,7 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 
 	// Start server
 	go func() {
-		err := server.Start("8083")
+		err := server.Start("0") // Use dynamic port allocation
 		require.NoError(t, err)
 	}()
 	// Wait for server to be ready
@@ -43,7 +43,7 @@ waitLoop:
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
 	// Test WebSocket connection
-	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:8083/ws", nil)
+	conn, _, err := websocket.DefaultDialer.Dial("ws://localhost:"+port+"/ws", nil)
 	require.NoError(t, err)
 	defer conn.Close()
 
