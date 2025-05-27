@@ -21,10 +21,22 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 		err := server.Start("8083")
 		require.NoError(t, err)
 	}()
-	time.Sleep(100 * time.Millisecond)
-
-	// Test health check
-	resp, err := http.Get("http://localhost:8083/health")
+	// Wait for server to be ready
+	timeout := time.After(5 * time.Second)
+	tick := time.Tick(100 * time.Millisecond)
+	var resp *http.Response
+	var err error
+	for {
+		select {
+		case <-timeout:
+			t.Fatalf("Server did not become ready in time")
+		case <-tick:
+			resp, err = http.Get("http://localhost:8083/health")
+			if err == nil && resp.StatusCode == http.StatusOK {
+				break
+			}
+		}
+	}
 	require.NoError(t, err)
 	assert.Equal(t, http.StatusOK, resp.StatusCode)
 
