@@ -19,12 +19,32 @@ jobs:
         with:
           go-version: '1.23.0'
 
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        id: go-cache
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
       - name: Run Snyk to check for vulnerabilities
         uses: snyk/actions/golang@master
         env:
           SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
         with:
           args: --severity-threshold=high
+
+      - name: Upload Go cache
+        if: steps.go-cache.outputs.cache-hit != 'true'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
 
   sonarqube-scan:
     runs-on: ubuntu-latest
@@ -37,6 +57,20 @@ jobs:
         uses: actions/setup-go@v4
         with:
           go-version: '1.23.0'
+
+      - name: Cache Go modules
+        uses: actions/cache@v3
+        id: go-cache-sonar
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
+          restore-keys: |
+            ${{ runner.os }}-go-
+
+      - name: Install Dependencies
+        run: go mod tidy
 
       - name: Run tests with coverage
         run: |
@@ -59,4 +93,13 @@ jobs:
         uses: codecov/codecov-action@v3
         with:
           file: ./coverage.out
-          fail_ci_if_error: true 
+          fail_ci_if_error: true
+
+      - name: Upload Go cache
+        if: steps.go-cache-sonar.outputs.cache-hit != 'true'
+        uses: actions/cache@v3
+        with:
+          path: |
+            ~/go/pkg/mod
+            ~/.cache/go-build
+          key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }} 
