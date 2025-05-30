@@ -76,6 +76,7 @@ jobs:
         run: |
           go test -v -coverprofile=coverage.out ./...
           go tool cover -func=coverage.out
+        
 
       - name: SonarQube Scan
         uses: SonarSource/sonarqube-scan-action@master
