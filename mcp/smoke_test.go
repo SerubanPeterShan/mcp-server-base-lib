@@ -23,6 +23,12 @@ func TestSmokeBasicFunctionality(t *testing.T) {
 	}()
 	time.Sleep(100 * time.Millisecond)
 
+	// Get port from server or use default
+	port := "8083" // Default port
+	if server.server != nil {
+		port = server.server.Addr[1:] // Remove leading ":"
+	}
+
 	// Test health check
 	resp, err := http.Get("http://localhost:8083/health")
 	require.NoError(t, err)

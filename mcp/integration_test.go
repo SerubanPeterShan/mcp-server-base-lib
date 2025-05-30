@@ -44,20 +44,20 @@ func TestIntegrationMultipleClients(t *testing.T) {
 	}
 
 	// Test message broadcasting
-	msg := Message{
-		Type:    "test",
-		Payload: json.RawMessage(`{"data": "broadcast"}`),
+	broadcastMsg := Message{
+		Type:    "broadcast",
+		Payload: json.RawMessage(`{"data":"broadcast"}`),
 	}
 
-	server.Broadcast(msg)
+	server.Broadcast(broadcastMsg)
 
 	// Verify all clients receive the message
 	for _, client := range clients {
 		var receivedMsg Message
 		err := client.ReadJSON(&receivedMsg)
 		require.NoError(t, err)
-		assert.Equal(t, msg.Type, receivedMsg.Type)
-		assert.Equal(t, msg.Payload, receivedMsg.Payload)
+		assert.Equal(t, broadcastMsg.Type, receivedMsg.Type)
+		assert.Equal(t, broadcastMsg.Payload, receivedMsg.Payload)
 	}
 }
 
@@ -115,7 +115,7 @@ func TestIntegrationServerShutdown(t *testing.T) {
 	assert.Len(t, clients, 1)
 
 	// Properly shut down the server
-	err = server.Stop()
+	err = server.Shutdown()
 	require.NoError(t, err)
 
 	// Verify client is disconnected

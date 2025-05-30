@@ -88,12 +88,16 @@ func (s *Server) Start(port string) error {
 	go s.handleWebSocket()
 
 	// Set up HTTP routes
-	http.HandleFunc("/ws", s.handleWebSocketConnection)
-	http.HandleFunc("/health", s.handleHealthCheck)
+	mux := http.NewServeMux()
+	mux.HandleFunc("/ws", s.handleWebSocketConnection)
+	mux.HandleFunc("/health", s.handleHealthCheck)
 
 	// Start HTTP server
 	s.logger.Infof("Starting MCP server on port %s", port)
-	s.server = &http.Server{Addr: ":" + port}
+	s.server = &http.Server{
+		Addr:    ":" + port,
+		Handler: mux,
+	}
 	return s.server.ListenAndServe()
 }
 
